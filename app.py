@@ -17,9 +17,9 @@ import streamlit as st
 APP_TITLE = "Tasbeeh Tracker"
 DB_PATH = Path(__file__).parent / "data" / "tasbeeh_tracker.db"
 DEFAULT_HADITH_API_KEY = "$2y$10$4rTM9bbsY1QuH0HE2W0gufDS33KuX32Kdi50kfx9v9LJHyA2K2y"
-PERSON_NAME_EN = "New Person Name"
-PERSON_NAME_UR = "نیا نام"
-PERSON_NAME_AR = "الاسم الجديد"
+PERSON_NAME_EN = "siffat abbas"
+PERSON_NAME_UR = "صفت عباس"
+PERSON_NAME_AR = "صفت عباس"
 
 DEED_CATEGORIES = [
     "Zikr",
