@@ -178,7 +178,7 @@ def apply_styles() -> None:
           font-family: 'Inter', sans-serif;
         }
         .block-container {
-          max-width: 1080px;
+          max-width: 1120px;
           padding-top: 1rem;
           padding-bottom: 2.5rem;
         }
@@ -333,12 +333,20 @@ def apply_styles() -> None:
           font-weight: 600;
         }
         .stMetric {
-          background: linear-gradient(135deg, rgba(255,255,255,0.34), rgba(255,255,255,0.17));
-          border: 1px solid rgba(255,255,255,0.52);
+          background: linear-gradient(135deg, rgba(255,255,255,0.78), rgba(247,255,251,0.62));
+          border: 1px solid rgba(157, 208, 186, 0.55);
           border-radius: 12px;
           padding: 8px;
           backdrop-filter: blur(12px);
           -webkit-backdrop-filter: blur(12px);
+          box-shadow: 0 8px 16px rgba(25, 78, 63, 0.08);
+        }
+        [data-testid="stMetricLabel"] {
+          color: #205344 !important;
+          font-weight: 600 !important;
+        }
+        [data-testid="stMetricValue"] {
+          color: #173f35 !important;
         }
         .stButton > button {
           border-radius: 12px !important;
@@ -354,15 +362,15 @@ def apply_styles() -> None:
           box-shadow: 0 14px 26px rgba(31, 122, 92, 0.40) !important;
         }
         .deed-chip {
-          border: 1px solid rgba(255,255,255,0.45);
+          border: 1px solid rgba(149, 205, 181, 0.45);
           border-radius: 14px;
-          background: linear-gradient(145deg, rgba(255,255,255,0.34), rgba(255,255,255,0.16));
+          background: linear-gradient(145deg, rgba(255,255,255,0.92), rgba(241,255,249,0.86));
           backdrop-filter: blur(12px);
           -webkit-backdrop-filter: blur(12px);
           padding: .6rem .72rem;
           margin-bottom: .4rem;
           min-height: 78px;
-          box-shadow: 0 10px 24px rgba(24, 74, 60, 0.16);
+          box-shadow: 0 8px 16px rgba(24, 74, 60, 0.10);
         }
         .deed-chip-title {
           font-size: .95rem;
@@ -389,6 +397,19 @@ def apply_styles() -> None:
         [data-baseweb="tab"] {
           border-radius: 10px !important;
           padding: .4rem .8rem !important;
+        }
+        div[data-testid="stVerticalBlock"] > div:has(> div[data-testid="stHorizontalBlock"]) {
+          margin-bottom: .2rem;
+        }
+        [data-testid="stDataFrame"], .stAltairChart {
+          border-radius: 12px;
+          overflow: hidden;
+        }
+        [data-testid="stForm"] {
+          background: linear-gradient(135deg, rgba(255,255,255,0.78), rgba(239,255,248,0.62));
+          border: 1px solid rgba(143, 198, 174, 0.5);
+          border-radius: 14px;
+          padding: .75rem;
         }
         @media (max-width: 768px) {
           .hero-title { font-size: 1.35rem; }
@@ -772,108 +793,110 @@ def front_daily_cards() -> None:
 
 
 def deeds_tab(conn: sqlite3.Connection, user_name: str, df: pd.DataFrame) -> None:
-    st.subheader("Collective Deeds")
-    st.caption("Choose step size, then tap category button. Chart updates instantly.")
+    with st.container(border=True):
+        st.subheader("Collective Deeds")
+        st.caption("Choose step size, then tap category button. Chart updates instantly.")
 
-    counts = category_count_map(df)
-    deed_totals = [counts.get(cat, 0) for cat in DEED_CATEGORIES]
-    today_utc = datetime.utcnow().date().isoformat()
-    today_total = int(df[df["created_at"].str.startswith(today_utc)]["count"].sum()) if not df.empty else 0
-    all_total = int(sum(deed_totals))
+        counts = category_count_map(df)
+        deed_totals = [counts.get(cat, 0) for cat in DEED_CATEGORIES]
+        today_utc = datetime.utcnow().date().isoformat()
+        today_total = int(df[df["created_at"].str.startswith(today_utc)]["count"].sum()) if not df.empty else 0
+        all_total = int(sum(deed_totals))
 
-    m1, m2 = st.columns(2)
-    m1.metric("Total Deeds", all_total)
-    m2.metric("Added Today", today_total)
+        m1, m2 = st.columns(2)
+        m1.metric("Total Deeds", all_total)
+        m2.metric("Added Today", today_total)
 
-    step = st.radio(
-        "Tap increment",
-        options=[1, 3, 5],
-        horizontal=True,
-        index=0,
-        format_func=lambda x: f"+{x}",
-    )
-
-    chart_rows = pd.DataFrame(
-        {
-            "Category": DEED_CATEGORIES,
-            "Label": [CATEGORY_LABELS[c] for c in DEED_CATEGORIES],
-            "Total": deed_totals,
-            "Color": [CATEGORY_META[c]["color"] for c in DEED_CATEGORIES],
-        }
-    )
-    hover = alt.selection_point(on="mouseover", fields=["Category"], empty=True)
-    bar = alt.Chart(chart_rows).mark_bar(cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
-        x=alt.X(
-            "Label:N",
-            sort=[CATEGORY_LABELS[c] for c in DEED_CATEGORIES],
-            axis=alt.Axis(labelAngle=0, title=None, labelLimit=160, labelFontSize=12, labelPadding=8),
-        ),
-        y=alt.Y("Total:Q", title=None, axis=alt.Axis(grid=True)),
-        color=alt.Color("Color:N", scale=None, legend=None),
-        opacity=alt.condition(hover, alt.value(1.0), alt.value(0.85)),
-        tooltip=["Category", "Total"],
-    ).add_params(hover)
-    labels = alt.Chart(chart_rows).mark_text(
-        align="center", baseline="bottom", dy=-4, color="#1b3628", fontWeight="bold"
-    ).encode(
-        x=alt.X("Label:N", sort=[CATEGORY_LABELS[c] for c in DEED_CATEGORIES]),
-        y=alt.Y("Total:Q"),
-        text=alt.Text("Total:Q"),
-    )
-    st.altair_chart(
-        (bar + labels).properties(height=330).configure_axis(gridColor="#d9e8de"),
-        use_container_width=True,
-    )
-
-    st.markdown("#### Quick Add")
-    for category in DEED_CATEGORIES:
-        icon = CATEGORY_META[category]["icon"]
-        st.markdown(
-            "<div class='deed-chip'>"
-            f"<p class='deed-chip-title'>{icon} {CATEGORY_LABELS[category]}</p>"
-            f"<p class='deed-chip-total'>Total: {counts.get(category, 0)}</p>"
-            "</div>",
-            unsafe_allow_html=True,
+        step = st.radio(
+            "Tap increment",
+            options=[1, 3, 5],
+            horizontal=True,
+            index=0,
+            format_func=lambda x: f"+{x}",
         )
-        if st.button(f"+{step} {CATEGORY_LABELS[category]}", key=f"btn-{category}", use_container_width=True):
-            add_entry(conn, user_name, category, int(step), 0, "")
-            st.toast(f"{icon} {CATEGORY_LABELS[category]} +{step}")
-            st.rerun()
+
+        chart_rows = pd.DataFrame(
+            {
+                "Category": DEED_CATEGORIES,
+                "Label": [CATEGORY_LABELS[c] for c in DEED_CATEGORIES],
+                "Total": deed_totals,
+                "Color": [CATEGORY_META[c]["color"] for c in DEED_CATEGORIES],
+            }
+        )
+        hover = alt.selection_point(on="mouseover", fields=["Category"], empty=True)
+        bar = alt.Chart(chart_rows).mark_bar(cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
+            x=alt.X(
+                "Label:N",
+                sort=[CATEGORY_LABELS[c] for c in DEED_CATEGORIES],
+                axis=alt.Axis(labelAngle=0, title=None, labelLimit=160, labelFontSize=12, labelPadding=8),
+            ),
+            y=alt.Y("Total:Q", title=None, axis=alt.Axis(grid=True)),
+            color=alt.Color("Color:N", scale=None, legend=None),
+            opacity=alt.condition(hover, alt.value(1.0), alt.value(0.85)),
+            tooltip=["Category", "Total"],
+        ).add_params(hover)
+        labels = alt.Chart(chart_rows).mark_text(
+            align="center", baseline="bottom", dy=-4, color="#1b3628", fontWeight="bold"
+        ).encode(
+            x=alt.X("Label:N", sort=[CATEGORY_LABELS[c] for c in DEED_CATEGORIES]),
+            y=alt.Y("Total:Q"),
+            text=alt.Text("Total:Q"),
+        )
+        st.altair_chart(
+            (bar + labels).properties(height=330).configure_axis(gridColor="#d9e8de"),
+            use_container_width=True,
+        )
+
+        st.markdown("#### Quick Add")
+        for category in DEED_CATEGORIES:
+            icon = CATEGORY_META[category]["icon"]
+            st.markdown(
+                "<div class='deed-chip'>"
+                f"<p class='deed-chip-title'>{icon} {CATEGORY_LABELS[category]}</p>"
+                f"<p class='deed-chip-total'>Total: {counts.get(category, 0)}</p>"
+                "</div>",
+                unsafe_allow_html=True,
+            )
+            if st.button(f"+{step} {CATEGORY_LABELS[category]}", key=f"btn-{category}", use_container_width=True):
+                add_entry(conn, user_name, category, int(step), 0, "")
+                st.toast(f"{icon} {CATEGORY_LABELS[category]} +{step}")
+                st.rerun()
 
 
 def sadaqah_tab(conn: sqlite3.Connection, user_name: str, df: pd.DataFrame) -> None:
-    st.subheader("Sadaqah")
+    with st.container(border=True):
+        st.subheader("Sadaqah")
 
-    counts = category_count_map(df)
-    sadaqah_count = counts.get(SADAQAH_CATEGORY, 0)
-    total_pkr = int(df.loc[df["category"] == SADAQAH_CATEGORY, "amount_pkr"].sum()) if not df.empty else 0
+        counts = category_count_map(df)
+        sadaqah_count = counts.get(SADAQAH_CATEGORY, 0)
+        total_pkr = int(df.loc[df["category"] == SADAQAH_CATEGORY, "amount_pkr"].sum()) if not df.empty else 0
 
-    graph_df = pd.DataFrame(
-        {"Metric": ["Sadaqah Entries", "Sadaqah PKR"], "Value": [sadaqah_count, total_pkr]}
-    )
-    s_bar = alt.Chart(graph_df).mark_bar(cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
-        x=alt.X("Metric:N", axis=alt.Axis(labelAngle=0, title=None)),
-        y=alt.Y("Value:Q", axis=alt.Axis(grid=True), title=None),
-        color=alt.value("#3f9169"),
-        tooltip=["Metric", "Value"],
-    )
-    s_lbl = alt.Chart(graph_df).mark_text(
-        align="center", baseline="bottom", dy=-4, color="#1b3628", fontWeight="bold"
-    ).encode(x="Metric:N", y="Value:Q", text="Value:Q")
-    st.altair_chart((s_bar + s_lbl).properties(height=260), use_container_width=True)
+        graph_df = pd.DataFrame(
+            {"Metric": ["Sadaqah Entries", "Sadaqah PKR"], "Value": [sadaqah_count, total_pkr]}
+        )
+        s_bar = alt.Chart(graph_df).mark_bar(cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
+            x=alt.X("Metric:N", axis=alt.Axis(labelAngle=0, title=None)),
+            y=alt.Y("Value:Q", axis=alt.Axis(grid=True), title=None),
+            color=alt.value("#3f9169"),
+            tooltip=["Metric", "Value"],
+        )
+        s_lbl = alt.Chart(graph_df).mark_text(
+            align="center", baseline="bottom", dy=-4, color="#1b3628", fontWeight="bold"
+        ).encode(x="Metric:N", y="Value:Q", text="Value:Q")
+        st.altair_chart((s_bar + s_lbl).properties(height=260), use_container_width=True)
 
-    m1, m2 = st.columns(2)
-    m1.metric("Sadaqah Entries", f"{sadaqah_count}")
-    m2.metric("Total Sadaqah (PKR)", f"{total_pkr:,}")
+        m1, m2 = st.columns(2)
+        m1.metric("Sadaqah Entries", f"{sadaqah_count}")
+        m2.metric("Total Sadaqah (PKR)", f"{total_pkr:,}")
 
-    with st.form("sadaqah-pkr-form", clear_on_submit=True):
-        amount_pkr = st.number_input("Amount (PKR)", min_value=1, max_value=100000000, value=100, step=50)
-        note = st.text_input("Optional note")
-        submitted = st.form_submit_button("Add Sadaqah", use_container_width=True)
-        if submitted:
-            add_entry(conn, user_name, SADAQAH_CATEGORY, 1, int(amount_pkr), note)
-            st.success("Sadaqah added.")
-            st.rerun()
+        with st.form("sadaqah-pkr-form", clear_on_submit=True):
+            amount_pkr = st.number_input("Amount (PKR)", min_value=1, max_value=100000000, value=100, step=50)
+            note = st.text_input("Optional note")
+            submitted = st.form_submit_button("Add Sadaqah", use_container_width=True)
+            if submitted:
+                add_entry(conn, user_name, SADAQAH_CATEGORY, 1, int(amount_pkr), note)
+                st.success("Sadaqah added.")
+                st.rerun()
 
 
 def settings_section(conn: sqlite3.Connection, user_name: str) -> None:
