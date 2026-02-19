@@ -17,7 +17,7 @@ import streamlit as st
 APP_TITLE = "Tasbeeh Tracker"
 DB_PATH = Path(__file__).parent / "data" / "tasbeeh_tracker.db"
 DEFAULT_HADITH_API_KEY = "$2y$10$4rTM9bbsY1QuH0HE2W0gufDS33KuX32Kdi50kfx9v9LJHyA2K2y"
-PERSON_NAME_EN = "siffat abbas"
+PERSON_NAME_EN = "Siffat Abbas"
 PERSON_NAME_UR = "صفت عباس"
 PERSON_NAME_AR = "صفت عباس"
 
@@ -209,11 +209,11 @@ def apply_styles() -> None:
           margin-top: .8rem;
           padding: .85rem 1rem;
           border-radius: 10px;
-          background: linear-gradient(135deg, rgba(255,255,255,0.38), rgba(255,255,255,0.18));
-          border: 1px solid rgba(255,255,255,0.54);
+          background: linear-gradient(135deg, rgba(16, 74, 58, 0.55), rgba(30, 109, 84, 0.48));
+          border: 1px solid rgba(152, 230, 204, 0.45);
           backdrop-filter: blur(14px);
           -webkit-backdrop-filter: blur(14px);
-          color: #20473d;
+          color: #eefdf7;
           line-height: 1.55;
         }
         .hero-dua-urdu {
@@ -225,7 +225,7 @@ def apply_styles() -> None:
           font-family: 'Noto Nastaliq Urdu', 'Noto Naskh Arabic', 'Amiri', serif;
           font-size: 1.12rem;
           line-height: 2.2;
-          color: #153d33;
+          color: #f2fff9;
         }
         .hero-dua-arabic {
           margin-top: .65rem;
@@ -236,7 +236,7 @@ def apply_styles() -> None:
           font-family: 'Noto Naskh Arabic', 'Scheherazade New', 'Amiri', serif;
           font-size: 1.28rem;
           line-height: 2.15;
-          color: #153d33;
+          color: #f4fffa;
         }
         .cat-box {
           background: rgba(255,255,255,0.86);
@@ -266,6 +266,16 @@ def apply_styles() -> None:
           backdrop-filter: blur(16px);
           -webkit-backdrop-filter: blur(16px);
           box-shadow: 0 12px 30px rgba(25, 78, 63, 0.16), inset 0 1px 0 rgba(255,255,255,0.6);
+        }
+        .daily-card-ayah {
+          background: linear-gradient(135deg, rgba(219, 247, 234, 0.58), rgba(196, 238, 218, 0.40));
+          border: 1px solid rgba(72, 160, 124, 0.35);
+          box-shadow: 0 10px 24px rgba(44, 122, 92, 0.16), inset 0 1px 0 rgba(255,255,255,0.65);
+        }
+        .daily-card-hadees {
+          background: linear-gradient(135deg, rgba(188, 235, 214, 0.66), rgba(138, 209, 178, 0.48));
+          border: 1px solid rgba(37, 122, 92, 0.40);
+          box-shadow: 0 10px 24px rgba(24, 99, 73, 0.20), inset 0 1px 0 rgba(255,255,255,0.60);
         }
         .daily-title {
           margin: 0 0 .4rem 0;
@@ -728,7 +738,7 @@ def front_daily_cards() -> None:
     with c1:
         st.markdown(
             (
-                "<div class='daily-card'>"
+                "<div class='daily-card daily-card-ayah'>"
                 "<p class='daily-title'>Ayat of the Day</p>"
                 f"<div class='daily-ref'>{escape(ayah.get('ref', 'Quran'))}</div>"
                 f"<p class='daily-arabic'>{escape(ayah.get('arabic', ''))}</p>"
@@ -745,7 +755,7 @@ def front_daily_cards() -> None:
     with c2:
         st.markdown(
             (
-                "<div class='daily-card'>"
+                "<div class='daily-card daily-card-hadees'>"
                 "<p class='daily-title'>Hadees of the Day</p>"
                 f"<div class='daily-ref'>{escape(hadith.get('ref', 'Hadith'))}</div>"
                 f"<p class='daily-arabic'>{escape(hadith.get('arabic', ''))}</p>"
