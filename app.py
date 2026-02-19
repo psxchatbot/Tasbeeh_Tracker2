@@ -169,6 +169,18 @@ def apply_styles() -> None:
         """
         <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&family=Noto+Naskh+Arabic:wght@500;600;700&family=Noto+Nastaliq+Urdu:wght@400;500;600&display=swap');
+        :root {
+          --bg: #e8f3ee;
+          --surface: #f8fffb;
+          --surface-2: #eefaf4;
+          --primary: #1f7a5c;
+          --secondary: #2f8e6c;
+          --accent: #2b6ea3;
+          --text-main: #173f35;
+          --text-muted: #2c6354;
+          --border: #9ed2bb;
+          --success: #2f9b76;
+        }
         .stApp {
           background:
             radial-gradient(circle at 12% 12%, rgba(118, 197, 163, 0.30), rgba(255,255,255,0) 28%),
@@ -182,6 +194,12 @@ def apply_styles() -> None:
           padding-top: 1rem;
           padding-bottom: 2.5rem;
         }
+        [data-testid="stVerticalBlockBorderWrapper"] {
+          background: linear-gradient(145deg, rgba(248,255,251,0.86), rgba(236,249,243,0.72));
+          border: 1px solid rgba(134, 194, 167, 0.52) !important;
+          border-radius: 16px !important;
+          box-shadow: 0 12px 24px rgba(20, 70, 54, 0.10) !important;
+        }
         .hero {
           background: linear-gradient(135deg, rgba(255,255,255,0.33), rgba(255,255,255,0.16));
           backdrop-filter: blur(20px) saturate(140%);
@@ -193,14 +211,14 @@ def apply_styles() -> None:
           box-shadow: 0 18px 42px rgba(39, 78, 117, 0.2), inset 0 1px 0 rgba(255,255,255,0.6);
         }
         .hero-title {
-          color: #2b6ea3;
+          color: var(--accent);
           font-size: 1.8rem;
           margin: 0;
           font-family: 'Playfair Display', serif;
           text-shadow: 0 2px 14px rgba(255,255,255,0.5);
           text-align: center;
         }
-        .hero-text { color: #245245; margin: .4rem 0 0; line-height: 1.45; }
+        .hero-text { color: var(--text-main); margin: .4rem 0 0; line-height: 1.45; }
         .hero-intro {
           text-align: center;
           font-size: 1.04rem;
@@ -213,7 +231,7 @@ def apply_styles() -> None:
           border: 1px solid rgba(152, 230, 204, 0.45);
           backdrop-filter: blur(14px);
           -webkit-backdrop-filter: blur(14px);
-          color: #eefdf7;
+          color: #f4fffb;
           line-height: 1.55;
         }
         .hero-dua-urdu {
@@ -279,17 +297,17 @@ def apply_styles() -> None:
         }
         .daily-title {
           margin: 0 0 .4rem 0;
-          color: #173f35;
+          color: var(--text-main);
           font-size: 1rem;
           font-weight: 700;
         }
         .daily-ref {
-          color: #2b6153;
+          color: var(--text-muted);
           font-size: .88rem;
           margin-bottom: .4rem;
         }
         .daily-text {
-          color: #234b40;
+          color: var(--text-main);
           line-height: 1.65;
           font-size: 1rem;
           margin: 0;
@@ -322,12 +340,12 @@ def apply_styles() -> None:
         .daily-source {
           margin-top: .45rem;
           font-size: .8rem;
-          color: #2c6354;
+          color: var(--text-muted);
         }
         .daily-english-label {
           margin: .45rem 0 .2rem;
           font-size: .82rem;
-          color: #2f5d50;
+          color: var(--text-muted);
           letter-spacing: .02em;
           text-transform: uppercase;
           font-weight: 600;
@@ -342,24 +360,39 @@ def apply_styles() -> None:
           box-shadow: 0 8px 16px rgba(25, 78, 63, 0.08);
         }
         [data-testid="stMetricLabel"] {
-          color: #205344 !important;
+          color: var(--text-muted) !important;
           font-weight: 600 !important;
         }
         [data-testid="stMetricValue"] {
-          color: #173f35 !important;
+          color: var(--text-main) !important;
         }
         .stButton > button {
           border-radius: 12px !important;
           border: 1px solid rgba(255,255,255,0.45) !important;
           font-weight: 600 !important;
           color: #fff !important;
-          background: linear-gradient(135deg, rgba(31, 122, 92, 0.88), rgba(55, 167, 126, 0.86)) !important;
+          background: linear-gradient(135deg, rgba(31, 122, 92, 0.95), rgba(47, 155, 118, 0.92)) !important;
           box-shadow: 0 10px 24px rgba(31, 122, 92, 0.32) !important;
           transition: transform .15s ease, box-shadow .15s ease !important;
         }
         .stButton > button:hover {
           transform: translateY(-1px);
           box-shadow: 0 14px 26px rgba(31, 122, 92, 0.40) !important;
+        }
+        [data-testid="stMarkdownContainer"] h3 {
+          color: var(--text-main);
+          letter-spacing: -0.01em;
+        }
+        [data-testid="stMarkdownContainer"] p {
+          color: var(--text-muted);
+        }
+        [data-testid="stExpander"] {
+          border: 1px solid rgba(140, 196, 172, 0.48) !important;
+          border-radius: 12px !important;
+          background: linear-gradient(145deg, rgba(247,255,251,0.85), rgba(235,248,241,0.66));
+        }
+        [data-testid="stExpanderToggleIcon"] svg {
+          color: var(--primary);
         }
         .deed-chip {
           border: 1px solid rgba(149, 205, 181, 0.45);
@@ -397,6 +430,11 @@ def apply_styles() -> None:
         [data-baseweb="tab"] {
           border-radius: 10px !important;
           padding: .4rem .8rem !important;
+        }
+        [aria-selected="true"][data-baseweb="tab"] {
+          background: linear-gradient(135deg, rgba(31,122,92,0.18), rgba(47,155,118,0.10)) !important;
+          color: var(--text-main) !important;
+          font-weight: 700 !important;
         }
         div[data-testid="stVerticalBlock"] > div:has(> div[data-testid="stHorizontalBlock"]) {
           margin-bottom: .2rem;
@@ -843,7 +881,10 @@ def deeds_tab(conn: sqlite3.Connection, user_name: str, df: pd.DataFrame) -> Non
             text=alt.Text("Total:Q"),
         )
         st.altair_chart(
-            (bar + labels).properties(height=330).configure_axis(gridColor="#d9e8de"),
+            (bar + labels)
+            .properties(height=330)
+            .configure_axis(gridColor="#d3e6dd", labelColor="#255746", titleColor="#255746")
+            .configure_view(strokeOpacity=0),
             use_container_width=True,
         )
 
@@ -883,7 +924,13 @@ def sadaqah_tab(conn: sqlite3.Connection, user_name: str, df: pd.DataFrame) -> N
         s_lbl = alt.Chart(graph_df).mark_text(
             align="center", baseline="bottom", dy=-4, color="#1b3628", fontWeight="bold"
         ).encode(x="Metric:N", y="Value:Q", text="Value:Q")
-        st.altair_chart((s_bar + s_lbl).properties(height=260), use_container_width=True)
+        st.altair_chart(
+            (s_bar + s_lbl)
+            .properties(height=260)
+            .configure_axis(gridColor="#d3e6dd", labelColor="#255746", titleColor="#255746")
+            .configure_view(strokeOpacity=0),
+            use_container_width=True,
+        )
 
         m1, m2 = st.columns(2)
         m1.metric("Sadaqah Entries", f"{sadaqah_count}")
